@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import type { LucideIcon } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
@@ -76,23 +76,31 @@ function DropdownArrow({ active }: { active?: boolean }) {
 export default function ToolBar() {
     const [isDevMode, setIsDevMode] = useState(false)
     const [showPopover, setShowPopover] = useState(false)
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+
 
     const toggleMode = () => {
         const nextMode = !isDevMode
         setIsDevMode(nextMode)
 
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current)
+        }
+
         setShowPopover(true)
 
-        setTimeout(() => setShowPopover(false), 1500)
+        timeoutRef.current = setTimeout(() => {
+            setShowPopover(false)
+        }, 1500)
     }
 
     return (
         <div className="flex justify-center items-center h-[100dvh] w-full">
             <div className='relative'>
-                <AnimatePresence>
+                <AnimatePresence mode="wait">
                     {showPopover && (
                         <motion.div
-                            key="popover"
+                            key={`popover-${isDevMode}`}
                             initial={{ opacity: 0, y: 20 }}
                             animate={{ opacity: 1, y: 0 }}
                             exit={{ opacity: 0, y: 20 }}

@@ -12,21 +12,79 @@ import {
 export default function Liquid() {
   const [open, setOpen] = useState(false);
   const [rotation, setRotation] = useState(0);
+  const [hintVisible, setHintVisible] = useState(true);
 
   const handleClick = () => {
     if (!open) {
-      // Opening → spin forward
       setRotation((prev) => prev + 360);
     } else {
-      // Closing → spin backward
       setRotation((prev) => prev - 360);
     }
     setOpen((prev) => !prev);
+    setHintVisible(false); // Hide hint once clicked
   };
 
   return (
     <div className="flex justify-center items-center h-[100dvh] w-full bg-white relative">
-      {/* Floating Button */}
+      {/* Click me + Curved Arrow */}
+      <AnimatePresence>
+        {hintVisible && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.6 }}
+            className="absolute bottom-44 right-32"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="-50 0 250 200"  // expanded viewBox to the left
+              className="w-56 h-56"
+              fill="none"
+            >
+              {/* Bigger Click me text shifted left */}
+              <text
+                x="-40"   // safe left shift
+                y="10"
+                fontSize="25"
+                fontWeight="700"
+                fill="black"
+              >
+                Click me
+              </text>
+
+              {/* Curved path */}
+              <path
+                id="arrowPath"
+                d="M 20 30 
+                  Q 80 70 60 110
+                  Q 40 150 120 170
+                  Q 160 180 180 208"
+                stroke="black"
+                strokeWidth="2.5"
+                fill="none"
+                markerEnd="url(#arrowhead)"
+              />
+
+              {/* Arrowhead */}
+              <defs>
+                <marker
+                  id="arrowhead"
+                  markerWidth="8"
+                  markerHeight="8"
+                  refX="5"
+                  refY="3"
+                  orient="auto"
+                >
+                  <path d="M0,0 L0,6 L6,3 z" fill="black" />
+                </marker>
+              </defs>
+            </svg>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Floating Button (N-logo) */}
       <motion.div
         className="absolute bottom-16 right-16 border rounded-full p-2 bg-black cursor-pointer"
         onClick={handleClick}

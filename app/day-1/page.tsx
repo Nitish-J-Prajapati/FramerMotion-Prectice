@@ -1,4 +1,4 @@
-import CardAnimation from "./premium";
+import CardAnimation from "./card";
 
 export default function Day1() {
   return (

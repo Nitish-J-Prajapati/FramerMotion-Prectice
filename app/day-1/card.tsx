@@ -10,7 +10,6 @@ type MotionCSSVars = TargetAndTransition & {
 
 export default function CardAnimation() {
     const [showPremium, setShowPremium] = useState(false);
-    const [count, setCount] = useState(0);
 
     const listVariants = {
         initial: { opacity: 0, y: 25 },
@@ -31,10 +30,10 @@ export default function CardAnimation() {
                     flexDirection: "column",
                     alignItems: "center",
                     backgroundColor: "#fff",
-                    border: "1px solid", // border-gray-300
-                    paddingLeft: "1.5rem", // px-6
+                    border: "1px solid", 
+                    paddingLeft: "1.5rem", 
                     paddingRight: "1.5rem",
-                    paddingBottom: "1.5rem", // pb-6
+                    paddingBottom: "1.5rem", 
                     gap: "8rem",
                     borderRadius: "48px",
                 }}

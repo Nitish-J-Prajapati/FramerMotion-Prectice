@@ -1,6 +1,6 @@
 import ToolBar from "./toolbar";
 
-export default function Day1() {
+export default function Day2() {
   return (
     <ToolBar />
   )

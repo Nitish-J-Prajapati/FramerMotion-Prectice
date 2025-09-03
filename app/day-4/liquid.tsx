@@ -12,7 +12,6 @@ import {
 export default function Liquid() {
   const [open, setOpen] = useState(false);
   const [rotation, setRotation] = useState(0);
-  const [hintVisible, setHintVisible] = useState(true);
 
   const handleClick = () => {
     if (!open) {
@@ -21,31 +20,25 @@ export default function Liquid() {
       setRotation((prev) => prev - 360);
     }
     setOpen((prev) => !prev);
-    setHintVisible(false); // Hide hint once clicked
   };
 
   return (
     <div className="flex justify-center items-center h-[100dvh] w-full bg-white relative">
       {/* Click me + Curved Arrow */}
       <AnimatePresence>
-        {hintVisible && (
-          <motion.div
-            initial={{ opacity: 1 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-            className="absolute bottom-44 right-32"
-          >
+        {/* Click me + Curved Arrow */}
+        {!open && (
+          <div className="absolute bottom-44 right-32">
             <svg
               xmlns="http://www.w3.org/2000/svg"
-              viewBox="-50 0 250 200"  // expanded viewBox to the left
+              viewBox="-50 0 250 200"
               className="w-56 h-56"
               fill="none"
             >
               {/* Bigger Click me text shifted left */}
               <text
-                x="-40"   // safe left shift
-                y="10"
+                x="-40"
+                y="30"
                 fontSize="25"
                 fontWeight="700"
                 fill="black"
@@ -55,11 +48,10 @@ export default function Liquid() {
 
               {/* Curved path */}
               <path
-                id="arrowPath"
-                d="M 20 30 
-                  Q 80 70 60 110
-                  Q 40 150 120 170
-                  Q 160 180 180 208"
+                d="M 20 40 
+           Q 80 70 60 110
+           Q 40 150 120 170
+           Q 160 180 180 200"
                 stroke="black"
                 strokeWidth="2.5"
                 fill="none"
@@ -80,7 +72,7 @@ export default function Liquid() {
                 </marker>
               </defs>
             </svg>
-          </motion.div>
+          </div>
         )}
       </AnimatePresence>
 

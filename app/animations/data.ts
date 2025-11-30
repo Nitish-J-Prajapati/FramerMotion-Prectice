@@ -13,5 +13,5 @@ export const animationsList = [
   { name: "Animation 12", slug: "animation-12", component: "Animation12" },
   { name: "Animation 13", slug: "animation-13", component: "Animation13" },
   { name: "Animation 14", slug: "animation-14", component: "Animation14" },
-  { name: "Animation 15", slug: "animation-15", component: "Animation15" },
+  // { name: "Animation 15", slug: "animation-15", component: "Animation15" },
 ];

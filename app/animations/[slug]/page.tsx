@@ -14,6 +14,10 @@ import Animation8 from "../components/Animation8";
 import Animation9 from "../components/Animation9";
 import Animation10 from "../components/Animation10";
 import Animation11 from "../components/Animation11";
+import Animation12 from "../components/Animation12";
+import Animation13 from "../components/Animation13";
+import Animation14 from "../components/Animation14";
+import Animation15 from "../components/Animation15";
 
 const componentsMap: Record<string, ComponentType> = {
   Animation1,
@@ -27,6 +31,10 @@ const componentsMap: Record<string, ComponentType> = {
   Animation9,
   Animation10,
   Animation11,
+  Animation12,
+  Animation13,
+  Animation14,
+  Animation15,
 };
 
 export default function AnimationPage() {

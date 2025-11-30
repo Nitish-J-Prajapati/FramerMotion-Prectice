@@ -2,254 +2,166 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronUp, ChevronDown, Plus, Minus, X } from "lucide-react";
+import { QrCode, Link, X } from "lucide-react";
+import Image from "next/image";
 
-// --- Data & Types ---
+// --- Configuration ---
+const QR_IMAGE_URL = "https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=https://framermotion.fyi";
 
-type ColorOption = {
-  name: string;
-  hex: string;
-  image: string; // URL to the specific colored iPhone
+// --- Smooth Transition Settings ---
+const smoothLayoutTransition = {
+  type: "spring" as const,
+  stiffness: 280,
+  damping: 30,
+  mass: 0.8
 };
 
-// Using the provided images
-const colors: ColorOption[] = [
-  // 1st Image (Initial State - Orange/Goldish)
-  { 
-    name: "Cosmic Orange", 
-    hex: "#C87545", 
-    image: "/Gemini_Generated_Image_vhi99jvhi99jvhi9.jpg" 
-  }, 
-  // 2nd Image (Blueish)
-  { 
-    name: "Nebula Blue", 
-    hex: "#445C83", 
-    image: "/iphone.jpg" 
-  }, 
-  // 3rd Image (Silver/White)
-  { 
-    name: "Starlight Silver", 
-    hex: "#E3E3E3", 
-    image: "/Gemini_Generated_Image_vhi99jvhi99jvhi9 (1).jpg" 
-  }, 
-];
-
-const features = [
-  {
-    id: "colors",
-    title: "Colors",
-    subtitle: "Choose from three bold finishes. iPhone 17 Pro shown in Cosmic Orange.",
-    hasColorPicker: true,
-  },
-  {
-    id: "aluminum",
-    title: "Aluminum Unibody",
-    subtitle: "Optimized for performance and battery. Aluminum alloy is remarkably light and has exceptional thermal conductivity.",
-    // Reusing the silver one as a placeholder for other feature slides
-    image: "/Gemini_Generated_Image_vhi99jvhi99jvhi9 (1).jpg" 
-  },
-  {
-    id: "vapor",
-    title: "Vapor Chamber",
-    subtitle: "Deionized water sealed inside moves heat away from the A19 Pro chip, allowing for even higher sustained performance.",
-    image: "/iphone.jpg" 
-  }
-];
+const textTransition = {
+  type: "spring" as const,
+  stiffness: 180,
+  damping: 20,
+  mass: 0.5
+};
 
 export default function Animation15() {
-  const [activeFeatureIndex, setActiveFeatureIndex] = useState(0);
-  const [selectedColorIndex, setSelectedColorIndex] = useState(0);
-  
-  // Track previous index to determine slide direction
-  const [direction, setDirection] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
+  const [isCopied, setIsCopied] = useState(false);
 
-  const handleNavClick = (index: number) => {
-    if (index !== activeFeatureIndex) {
-        setDirection(index > activeFeatureIndex ? 1 : -1);
-        setActiveFeatureIndex(index);
-    }
+  const handleCopy = () => {
+    if (isCopied) return;
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
   };
-
-  const handleNext = () => {
-    if (activeFeatureIndex < features.length - 1) {
-        setDirection(1);
-        setActiveFeatureIndex(prev => prev + 1);
-    }
-  };
-
-  const handlePrev = () => {
-    if (activeFeatureIndex > 0) {
-        setDirection(-1);
-        setActiveFeatureIndex(prev => prev - 1);
-    }
-  };
-
-  const activeFeature = features[activeFeatureIndex];
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-black text-white font-sans p-8">
+    <div className="flex items-center justify-center min-h-screen bg-white font-sans p-4">
       
-      {/* Main Container */}
-      <div className="w-full max-w-6xl h-[600px] flex gap-8 relative">
+      <motion.div
+        layout
+        data-isopen={isOpen}
+        initial={{ borderRadius: "3rem" }}
+        animate={{ borderRadius: isOpen ? "2.5rem" : "3rem" }}
+        transition={smoothLayoutTransition}
+        className="bg-[#EFF0F3] shadow-xl overflow-hidden relative"
+        style={{
+          width: isOpen ? 300 : "auto", 
+          height: isOpen ? 360 : 64, // Decreased height for a tighter fit
+        }}
+      >
         
-        {/* === LEFT: NAVIGATION & CONTROLS === */}
-        <div className="flex flex-col justify-center w-1/3 gap-4 z-20">
-          
-          {features.map((feature, index) => {
-            const isActive = index === activeFeatureIndex;
-            return (
-              <div key={feature.id} className="relative">
-                {/* Navigation Item */}
-                <motion.div
+        {/* ==================== CLOSED STATE ==================== */}
+        <AnimatePresence mode="popLayout">
+          {!isOpen && (
+            <motion.button
+              layout
+              initial={{ opacity: 0, filter: "blur(8px)" }}
+              animate={{ opacity: 1, filter: "blur(0px)" }}
+              exit={{ opacity: 0, filter: "blur(8px)" }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+              onClick={() => setIsOpen(true)}
+              className="flex items-center gap-3 px-8 h-full w-full whitespace-nowrap outline-none"
+            >
+              <QrCode className="w-6 h-6 text-gray-900" strokeWidth={2} />
+              <span className="font-semibold text-gray-900 text-[16px]">Show QR Code</span>
+            </motion.button>
+          )}
+        </AnimatePresence>
+
+        {/* ==================== OPEN STATE ==================== */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.4 }}
+              className="flex flex-col items-center justify-center h-full p-5 gap-4" // Decreased gap and padding
+            >
+              {/* QR Code Container */}
+              <motion.div 
+                className="bg-white p-2 rounded-[24px] shadow-sm"
+                initial={{ scale: 0.8, opacity: 0, filter: "blur(10px)" }}
+                animate={{ scale: 1, opacity: 1, filter: "blur(0px)" }}
+                exit={{ scale: 0.8, opacity: 0, filter: "blur(10px)" }}
+                transition={{ duration: 0.4, ease: "easeOut", delay: 0.1 }}
+              >
+                <div className="relative w-44 h-44">
+                    <Image 
+                        src={QR_IMAGE_URL}
+                        alt="QR Code"
+                        fill
+                        className="object-contain mix-blend-multiply opacity-90"
+                        unoptimized
+                    />
+                </div>
+              </motion.div>
+
+              {/* Actions Footer */}
+              <div className="flex items-center gap-2.5 w-full">
+                
+                {/* COPY LINK BUTTON */}
+                <motion.button
                   layout
-                  onClick={() => handleNavClick(index)}
-                  className={`
-                    relative overflow-hidden rounded-[24px] cursor-pointer transition-colors duration-300
-                    ${isActive ? "bg-[#1C1C1E]" : "bg-transparent hover:bg-[#1C1C1E]/30"}
-                  `}
-                  initial={false}
-                  animate={{
-                    height: isActive ? "auto" : "56px",
-                  }}
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                  onClick={handleCopy}
+                  className="flex-1 h-14 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors cursor-pointer relative overflow-hidden outline-none shadow-sm"
+                  whileTap={{ scale: 0.98 }}
                 >
-                  {/* Header */}
-                  <div className="flex items-center h-[56px] px-5">
-                    <div className={`w-7 h-7 rounded-full flex items-center justify-center border mr-4 transition-colors ${isActive ? "bg-white text-black border-white" : "border-white/30 text-white"}`}>
-                        {isActive ? <Minus size={14} strokeWidth={3} /> : <Plus size={14} strokeWidth={3} />}
-                    </div>
-                    <span className={`text-lg font-medium tracking-wide ${isActive ? "text-white" : "text-white/60"}`}>
-                        {feature.title}
-                    </span>
-                  </div>
+                  <motion.div layout className="flex items-center font-bold text-gray-900 text-[15px]">
+                    <Link size={18} strokeWidth={2.5} className="text-gray-900 mr-2" />
+                    
+                    {/* Stable "Cop" */}
+                    <span className="inline-block">Cop</span>
 
-                  {/* Expanded Content */}
-                  <div className="px-5 pb-6 pl-[60px]">
-                    <motion.p 
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: isActive ? 1 : 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="text-white/70 text-sm leading-relaxed mb-5"
-                    >
-                        {feature.subtitle}
-                    </motion.p>
-
-                    {/* Color Picker (Only for 'colors' slide) */}
-                    {feature.hasColorPicker && (
-                        <motion.div 
-                            className="flex gap-3"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            transition={{ delay: 0.1 }}
-                        >
-                            {colors.map((color, i) => (
-                                <button
-                                    key={color.name}
-                                    onClick={(e) => {
-                                        e.stopPropagation(); // Prevent triggering nav click
-                                        setSelectedColorIndex(i);
-                                    }}
-                                    className={`w-8 h-8 rounded-full border-2 transition-all relative ${selectedColorIndex === i ? "border-white scale-110" : "border-transparent hover:scale-105"}`}
-                                    style={{ backgroundColor: color.hex }}
-                                    title={color.name}
+                    {/* Swapping "y" / "ied" */}
+                    <div className="relative h-6 flex items-center justify-center">
+                        <AnimatePresence mode="popLayout" initial={false}>
+                            {isCopied ? (
+                                <motion.span
+                                    key="ied"
+                                    initial={{ y: "100%", opacity: 0, filter: "blur(4px)" }}
+                                    animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                                    exit={{ y: "-100%", opacity: 0, filter: "blur(4px)" }}
+                                    transition={textTransition}
+                                    className="block"
                                 >
-                                    {/* Active Ring */}
-                                    {selectedColorIndex === i && (
-                                        <motion.div 
-                                            layoutId="active-color-ring"
-                                            className="absolute -inset-1 rounded-full border border-white/50"
-                                            transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                                        />
-                                    )}
-                                </button>
-                            ))}
-                        </motion.div>
-                    )}
-                  </div>
-                </motion.div>
-              </div>
-            );
-          })}
-
-          {/* Floating Navigation Arrows */}
-          <div className="flex gap-2 mt-4 ml-2">
-             <button 
-                onClick={handlePrev}
-                disabled={activeFeatureIndex === 0}
-                className="w-10 h-10 rounded-full bg-[#1C1C1E] flex items-center justify-center text-white/80 hover:bg-[#2C2C2E] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-             >
-                <ChevronUp size={20} />
-             </button>
-             <button 
-                onClick={handleNext}
-                disabled={activeFeatureIndex === features.length - 1}
-                className="w-10 h-10 rounded-full bg-[#1C1C1E] flex items-center justify-center text-white/80 hover:bg-[#2C2C2E] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-             >
-                <ChevronDown size={20} />
-             </button>
-          </div>
-
-        </div>
-
-        {/* === RIGHT: IMAGE PREVIEW AREA === */}
-        <div 
-            className="flex-1 relative rounded-[40px] overflow-hidden bg-[#0A0A0A] border border-white/10 shadow-2xl cursor-pointer"
-            onClick={handleNext} // Clicking the slide advances to next feature
-        >
-            {/* Close Icon (Cosmetic) */}
-            <div className="absolute top-6 right-6 z-30 w-8 h-8 bg-[#1C1C1E] rounded-full flex items-center justify-center cursor-pointer hover:bg-[#2C2C2E] transition-colors">
-                <X size={16} className="text-white/60" />
-            </div>
-
-            <AnimatePresence mode="popLayout" initial={false} custom={direction}>
-                <motion.div
-                    key={activeFeature.id} 
-                    custom={direction}
-                    className="absolute inset-0 flex items-center justify-center p-12"
-                    // Slide In from Right (100%), Slide Out to Left (-50% + Fade)
-                    initial={{ x: "100%", opacity: 0, scale: 0.9 }} 
-                    animate={{ x: 0, opacity: 1, scale: 1 }}
-                    exit={{ x: "-20%", opacity: 0, scale: 0.95 }} 
-                    transition={{ 
-                        type: "spring",
-                        stiffness: 200,
-                        damping: 25,
-                        mass: 1
-                    }}
-                >
-                    {/* Inner Image Container */}
-                    <div className="relative w-full h-full flex items-center justify-center">
-                        {activeFeature.hasColorPicker ? (
-                            // For Color Picker Slide: Animate color changes with a crossfade
-                            <AnimatePresence mode="wait">
-                                <motion.img 
-                                    key={selectedColorIndex} // Trigger animation on color change
-                                    src={colors[selectedColorIndex].image}
-                                    alt="iPhone Color"
-                                    className="max-w-full max-h-full object-contain drop-shadow-2xl"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
-                                    transition={{ duration: 0.4 }}
-                                />
-                            </AnimatePresence>
-                        ) : (
-                            // For Standard Slides: Static image content
-                            <img 
-                                src={activeFeature.image}
-                                alt={activeFeature.title}
-                                className="max-w-full max-h-full object-contain drop-shadow-2xl"
-                            />
-                        )}
+                                    ied
+                                </motion.span>
+                            ) : (
+                                <motion.span
+                                    key="y"
+                                    initial={{ y: "100%", opacity: 0, filter: "blur(4px)" }}
+                                    animate={{ y: 0, opacity: 1, filter: "blur(0px)" }}
+                                    exit={{ y: "-100%", opacity: 0, filter: "blur(4px)" }}
+                                    transition={textTransition}
+                                    className="block"
+                                >
+                                    y
+                                </motion.span>
+                            )}
+                        </AnimatePresence>
                     </div>
-                </motion.div>
-            </AnimatePresence>
-            
-            {/* Subtle Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none z-10" />
-        </div>
 
-      </div>
+                    {/* Stable "Link" */}
+                    <span className="inline-block whitespace-pre"> Link</span>
+                  </motion.div>
+                </motion.button>
+
+                {/* CLOSE BUTTON */}
+                <motion.button
+                  layout
+                  onClick={() => setIsOpen(false)}
+                  className="w-14 h-14 bg-white rounded-full flex items-center justify-center hover:bg-gray-50 transition-colors outline-none shrink-0 cursor-pointer shadow-sm"
+                  whileTap={{ scale: 0.92 }}
+                >
+                  <X size={22} className="text-gray-900" strokeWidth={2.5} />
+                </motion.button>
+
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+      </motion.div>
     </div>
   );
 }

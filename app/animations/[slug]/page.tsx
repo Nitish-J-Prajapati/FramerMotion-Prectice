@@ -17,7 +17,7 @@ import Animation11 from "../components/Animation11";
 import Animation12 from "../components/Animation12";
 import Animation13 from "../components/Animation13";
 import Animation14 from "../components/Animation14";
-// import Animation15 from "../components/Animation15";
+import Animation15 from "../components/Animation15";
 
 const componentsMap: Record<string, ComponentType> = {
   Animation1,
@@ -34,7 +34,7 @@ const componentsMap: Record<string, ComponentType> = {
   Animation12,
   Animation13,
   Animation14,
-  // Animation15,
+  Animation15,
 };
 
 export default function AnimationPage() {
@@ -51,6 +51,6 @@ export default function AnimationPage() {
   const Component = componentsMap[anim.component];
 
   return (
-    <Component />  // <-- no wrapper, let animation fill screen
+    <Component />
   );
 }

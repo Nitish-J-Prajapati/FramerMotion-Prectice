@@ -13,8 +13,7 @@ import { Book as BookIcon } from "lucide-react";
 
 // --- Configuration ---
 const PAGE_COUNT = 16;
-// Total steps = Front Cover (1) + Pages (16) + Back Cover (1)
-const TOTAL_STEPS = PAGE_COUNT + 2; 
+const TOTAL_STEPS = PAGE_COUNT + 2; // Cover + Pages + Back
 
 const SCROLL_SENSITIVITY = 0.005;
 const DRAG_SENSITIVITY = 0.02;
@@ -31,7 +30,6 @@ const Page = ({
   progress: MotionValue<number>; 
   total: number; 
 }) => {
-  // Offset index by 1 because 0-1 is reserved for the Front Cover
   const adjustedIndex = index + 1;
 
   // Calculate rotation based on progress
@@ -40,9 +38,11 @@ const Page = ({
   // Z-Index handling
   const zIndex = useTransform(rotation, (r) => {
     if (r > -90) {
-      return total - index; // Closed stack order (higher index = lower z)
+      return total - index; // Closed stack order
     } else {
-      return index; // Open stack order
+      // 🟢 FIX: Added +1 offset so the first page (index 0) becomes z=1
+      // This ensures it sits ON TOP of the FrontCover (which is z=0)
+      return index + 1; 
     }
   });
 
@@ -105,7 +105,7 @@ const FrontCover = ({
     // Front cover rotates first: 0 -> 1
     const rotation = useTransform(progress, [0, 1], [0, -180]);
     
-    // Z-index: Always on top when closed
+    // Z-index: Always on top when closed (z > total), bottom when open (z = 0)
     const zIndex = useTransform(rotation, (r) => (r > -90 ? total + 10 : 0));
 
     return (
@@ -150,16 +150,12 @@ const BackCover = ({
     progress: MotionValue<number>;
     total: number;
 }) => {
-    // Back cover rotates last: (Total Pages + 1) -> (Total Pages + 2)
-    // e.g., if 16 pages, this flips from 17 -> 18
     const startRange = total + 1;
     const endRange = total + 2;
     
     const rotation = useTransform(progress, [startRange, endRange], [0, -180]);
     
-    // Z-index logic: 
-    // When sitting flat (0deg), it's the bottom-most layer (0).
-    // When flipped (-180deg), it should be on top of the stack (zIndex: high).
+    // Z-index logic for closing the book from the back
     const zIndex = useTransform(rotation, (r) => (r < -90 ? total + 10 : 0));
 
     return (
@@ -172,13 +168,13 @@ const BackCover = ({
             }}
             className="absolute inset-0 w-full h-full origin-left"
         >
-            {/* Inside Back Cover (Visible when reading) */}
+            {/* Inside Back Cover */}
             <div 
                 className="absolute inset-0 backface-hidden bg-[#111] rounded-r-lg"
                 style={{ backfaceVisibility: "hidden" }}
             />
 
-            {/* Outside Back Cover (Visible when closed at the end) */}
+            {/* Outside Back Cover */}
             <div 
                 className="absolute inset-0 backface-hidden bg-[#1A1A1A] rounded-l-lg flex flex-col items-center justify-center"
                 style={{ 
@@ -206,7 +202,6 @@ export default function Animation16() {
 
   const bookRotateZ = useTransform(smoothProgress, [0, TOTAL_STEPS / 2, TOTAL_STEPS], [0, -2, 0]);
 
-  // Mouse Wheel Handler
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
@@ -227,7 +222,6 @@ export default function Animation16() {
     };
   }, [progress]);
 
-  // Drag Handler
   const handlePan = (event: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
     const current = progress.get();
     const delta = -info.delta.x * DRAG_SENSITIVITY; 
@@ -254,14 +248,13 @@ export default function Animation16() {
         {/* The Book */}
         <motion.div
             style={{
-                // No 'x' translation here, so it stays centered
                 rotateZ: bookRotateZ,
                 rotateX: 10,
                 transformStyle: "preserve-3d",
             }}
             className="relative w-full h-full pointer-events-none" 
         >
-            {/* The Back Cover (Now Animated) */}
+            {/* The Back Cover */}
             <BackCover progress={smoothProgress} total={PAGE_COUNT} />
 
             {/* Pages */}
@@ -280,7 +273,6 @@ export default function Animation16() {
         </motion.div>
       </div>
 
-      {/* Instructions */}
       <div className="absolute bottom-8 left-0 right-0 text-center pointer-events-none">
         <p className="text-xs font-mono text-gray-400 uppercase tracking-widest">
             Scroll or Drag to Flip

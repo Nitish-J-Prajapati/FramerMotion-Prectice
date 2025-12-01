@@ -12,109 +12,104 @@ export default function Animation2() {
 
   const baseButton = "bg-[#F3EEE7] h-20 flex items-center justify-center rounded-full cursor-pointer";
 
+  // Variants to handle the "ghost" state of the inactive button
+  // Hidden buttons stay in the layout (no display:none) but are invisible and unclickable
+  const buttonVariants = {
+    visible: { opacity: 1, scale: 1 },
+    hidden: { opacity: 0, scale: 0.8 }
+  };
+
   return (
     <div className="flex h-[100dvh] justify-center items-center gap-6">
 
       {/* LIKE BUTTON */}
-      <AnimatePresence initial={false}>
-        {!isDislike && (
-          <motion.div
-            key="like"
-            layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ type: "spring", stiffness: 220, damping: 18 }}
-            className={`${baseButton} ${isLike ? "px-6" : "w-28"}`}
-            onClick={() => state === "none" && setState("like")}
-          >
-            {/* Content inside Like button */}
-            <motion.div layout className="flex items-center gap-3 overflow-hidden">
-
-              {/* Like Icon */}
-              <motion.div layout>
-                <ThumbsUp size={28} strokeWidth={2.5} />
-              </motion.div>
-
-              {/* Reveal content */}
-              {isLike && (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
-                  animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
-                  exit={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
-                  transition={{ duration: 0.35, ease: "easeOut" }}
-                  className="flex items-center gap-3 whitespace-nowrap"
-                >
-                  <span className="font-medium text-lg">Feedback Received!</span>
-
-                  {/* Undo Button */}
-                  <motion.button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setState("none");
-                    }}
-                    className="px-4 py-2 bg-white/70 rounded-full flex items-center gap-1"
-                  >
-                    <Undo2 size={20} />
-                    Undo
-                  </motion.button>
-                </motion.div>
-              )}
-            </motion.div>
+      <motion.div
+        key="like"
+        layout
+        variants={buttonVariants}
+        initial="visible"
+        animate={isDislike ? "hidden" : "visible"}
+        transition={{ type: "spring", stiffness: 220, damping: 18 }}
+        // When hidden, we disable pointer events so it can't be clicked
+        className={`${baseButton} ${isLike ? "px-6" : "w-28"} ${isDislike ? "pointer-events-none" : ""}`}
+        onClick={() => state === "none" && setState("like")}
+      >
+        <motion.div layout className="flex items-center gap-3 overflow-hidden">
+          <motion.div layout>
+            <ThumbsUp size={28} strokeWidth={2.5} />
           </motion.div>
-        )}
-      </AnimatePresence>
+
+          <AnimatePresence mode="popLayout">
+            {isLike && (
+              <motion.div
+                key="like-text"
+                layout
+                initial={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
+                animate={{ opacity: 1, clipPath: "inset(0 0% 0 0)" }}
+                exit={{ opacity: 0, clipPath: "inset(0 100% 0 0)" }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+                className="flex items-center gap-3 whitespace-nowrap"
+              >
+                <span className="font-medium text-lg">Feedback Received!</span>
+                <motion.button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setState("none");
+                  }}
+                  className="px-4 py-2 bg-white/70 rounded-full flex items-center gap-1"
+                >
+                  <Undo2 size={20} />
+                  Undo
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
 
       {/* DISLIKE BUTTON */}
-      <AnimatePresence initial={false}>
-        {!isLike && (
-          <motion.div
-            key="dislike"
-            layout
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.8 }}
-            transition={{ type: "spring", stiffness: 220, damping: 18 }}
-            className={`${baseButton} ${isDislike ? "px-6" : "w-28"}`}
-            onClick={() => state === "none" && setState("dislike")}
-          >
-            <motion.div layout className="flex items-center gap-3 overflow-hidden">
-
-              {/* Dislike Icon */}
-              <motion.div layout>
-                <ThumbsDown size={28} strokeWidth={2.5} />
-              </motion.div>
-
-              {/* Reveal */}
-              {isDislike && (
-                <motion.div
-                  layout
-                  initial={{ opacity: 0, clipPath: "inset(0 0 0 100%)" }}
-                  animate={{ opacity: 1, clipPath: "inset(0 0 0 0)" }}
-                  exit={{ opacity: 0, clipPath: "inset(0 0 0 100%)" }}
-                  transition={{ duration: 0.35, ease: "easeOut" }}
-                  className="flex items-center gap-3 whitespace-nowrap"
-                >
-                  <span className="font-medium text-lg">Feedback Received!</span>
-
-                  {/* Undo */}
-                  <motion.button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setState("none");
-                    }}
-                    className="px-4 py-2 bg-white/70 rounded-full flex items-center gap-1"
-                  >
-                    <Undo2 size={20} />
-                    Undo
-                  </motion.button>
-                </motion.div>
-              )}
-            </motion.div>
+      <motion.div
+        key="dislike"
+        layout
+        variants={buttonVariants}
+        initial="visible"
+        animate={isLike ? "hidden" : "visible"}
+        transition={{ type: "spring", stiffness: 220, damping: 18 }}
+        className={`${baseButton} ${isDislike ? "px-6" : "w-28"} ${isLike ? "pointer-events-none" : ""}`}
+        onClick={() => state === "none" && setState("dislike")}
+      >
+        <motion.div layout className="flex items-center gap-3 overflow-hidden">
+          <motion.div layout>
+            <ThumbsDown size={28} strokeWidth={2.5} />
           </motion.div>
-        )}
-      </AnimatePresence>
+
+          <AnimatePresence mode="popLayout">
+            {isDislike && (
+              <motion.div
+                key="dislike-text"
+                layout
+                initial={{ opacity: 0, clipPath: "inset(0 0 0 100%)" }}
+                animate={{ opacity: 1, clipPath: "inset(0 0 0 0)" }}
+                exit={{ opacity: 0, clipPath: "inset(0 0 0 100%)" }}
+                transition={{ duration: 0.35, ease: "easeOut" }}
+                className="flex items-center gap-3 whitespace-nowrap"
+              >
+                <span className="font-medium text-lg">Feedback Received!</span>
+                <motion.button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setState("none");
+                  }}
+                  className="px-4 py-2 bg-white/70 rounded-full flex items-center gap-1"
+                >
+                  <Undo2 size={20} />
+                  Undo
+                </motion.button>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
+      </motion.div>
 
     </div>
   );
